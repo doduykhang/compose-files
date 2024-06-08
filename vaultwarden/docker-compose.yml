@@ -1,0 +1,58 @@
+version: '3'
+
+services:
+  vaultwarden:
+    restart: always
+    container_name: vaultwarden
+    image: vaultwarden/server:latest
+    volumes:
+      - ./DockerStuff/vaultwarden:/data/
+    ports:
+      - 8889:80
+    environment:
+      - SMTP_HOST=smtp.gmail.com
+      - SMTP_PORT=587
+      - SMTP_FROM=dokhang295@gmail.com
+      - SMTP_FROM_NAME=khang
+      - SMTP_USERNAME=dokhang295@gmail.com
+      - SMTP_PASSWORD=ruge zrer ddbl gbsw
+      - SMTP_TIMEOUT=30
+      - SMTP_AUTH_MECHANISM="Plain"
+      - LOGIN_RATELIMIT_MAX_BUST=10
+      - LOGIN_RATELIMIT_SECONDS=60
+      - DOMAIN=http://localhost:8889
+      - INVITATION_ORG_NAME=Kang
+      - INVITATION_ALLOWED=true
+      - ADMIN_TOKEN=uge zrer ddbl gbsw
+      - SIGNUPS_ALLOWED=true
+      - SIGNUPS_VERIFY=true
+      - SIGNUPS_VERIFY_RESEND_TIME=3600
+      - SIGNUPS_VERIFY_RESEND_LIMIT=6
+      - EMERGENCY_ACCESS_ALLOWED=true
+      - SENDS_ALLOWED=true
+      - WEB_VAULT_ENABLED=true
+    networks:
+      - vault
+
+  caddy:
+    image: caddy:latest
+    restart: unless-stopped
+    container_name: caddy
+    ports:
+      - 80:80
+      - 443:443
+      - 8888:8888
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile
+      - ./caddy/site:/srv
+      - ./caddy/caddy_data:/data
+      - ./caddy/caddy_config:/config
+    networks:
+      - vault
+      - arr_arrs
+
+networks:
+  vault:
+    driver: bridge
+  arr_arrs:
+    external: true

@@ -1,0 +1,7 @@
+{
+    email dokhang295@gmail.com
+}
+
+localhost:8000 {
+    reverse_proxy http://vault:8889
+}

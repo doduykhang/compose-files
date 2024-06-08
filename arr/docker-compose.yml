@@ -1,0 +1,111 @@
+# The Arrs Stack - youtube.com/@KLTechVideos
+# Prowlarr - Sonarr - Radarr - Lidarr - Readarr
+version: "2.1"
+services:
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent:latest
+    container_name: qbittorrent
+    environment:
+      - PUID=1000
+      - PGID=100
+      - WEBUI_PORT=8080
+      - TORRENTING_PORT=6881
+    volumes:
+      - /home/khang/DockerStuff/arr/qbittorrent/config:/config
+      - /home/khang/DockerStuff/arr/Downloads:/downloads
+    networks:
+      - arrs
+    ports:
+      - 8080:8080
+      - 6881:6881
+      - 6881:6881/udp
+    restart: unless-stopped
+  
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:latest # Change to "latest" for stable
+    container_name: prowlarr
+    environment:
+      - PUID=1000
+      - PGID=100
+      - TZ=Europe/London
+    volumes:
+      - /home/khang/DockerStuff/arr/Prowlarr/config:/config
+      - /home/khang/DockerStuff/arr/Prowlarr/Backup:/data/Backup
+      - /home/khang/DockerStuff/arr/Downloads:/data/downloads
+    ports:
+      - 9696:9696
+    restart: unless-stopped
+    networks:
+      - arrs
+
+  radarr:
+    image: lscr.io/linuxserver/radarr:latest
+    container_name: radarr
+    environment:
+      - PUID=1000
+      - PGID=100
+      - TZ=Europe/London
+    volumes:
+      - /home/khang/DockerStuff/arr/Radarr/config:/config
+      - /home/khang/DockerStuff/arr/Radarr/Movies:/data/movies
+      - /home/khang/DockerStuff/arr/Downloads:/data/downloads
+      - /home/khang/DockerStuff/arr/Radarr/Backup:/data/Backup
+    ports:
+      - 7878:7878
+    restart: unless-stopped
+    networks:
+      - arrs
+   
+  lidarr:
+    image: lscr.io/linuxserver/lidarr:latest
+    container_name: lidarr
+    environment:
+      - PUID=1000
+      - PGID=100
+      - TZ=Etc/UTC
+    volumes:
+      - /home/khang/DockerStuff/arr/Lidarr/config:/config
+      - /home/khang/DockerStuff/arr/Lidarr/Music:/music
+      - /home/khang/DockerStuff/arr/Downloads:/downloads #optional
+    networks:
+      - arrs
+    ports:
+      - 8686:8686
+    restart: unless-stopped
+
+  jellyfin:
+    image: lscr.io/linuxserver/jellyfin:latest
+    container_name: jellyfin
+    environment:
+      - PUID=1000
+      - PGID=100
+      - TZ=Etc/UTC
+    volumes:
+      - /home/khang/DockerStuff/arr/Jellyfin/config:/config
+      - /home/khang/DockerStuff/arr/Radarr/Movies:/data/movies
+    ports:
+      - 8096:8096
+    networks:
+      - arrs
+    restart: unless-stopped
+
+  whisparr:
+    container_name: whisparr
+    image: ghcr.io/hotio/whisparr
+    ports:
+      - "6969:6969"
+    environment:
+      - PUID=1000
+      - PGID=100
+      - UMASK=002
+      - TZ=Etc/UTC
+    networks:
+      - arrs
+    volumes:
+      - /home/khang/DockerStuff/arr/Whisparr/config:/config
+      - /home/khang/DockerStuff/arr/Whisparr/Scenes:/data/scenes
+
+networks:
+  arrs:
+    driver: bridge
+    
